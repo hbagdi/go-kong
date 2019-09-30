@@ -1,5 +1,7 @@
 package kong
 
+//go:generate ifacemaker -f upstream_service.go -s UpstreamService -i UpstreamServiceInterface -p kong -c "DO NOT EDIT: Auto generated" -o upstream_service_interface.go
+ 
 import (
 	"context"
 	"encoding/json"

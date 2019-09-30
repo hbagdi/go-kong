@@ -1,5 +1,7 @@
 package kong
 
+//go:generate ifacemaker -f plugin_service.go -s PluginService -i PluginServiceInterface -p kong -c "DO NOT EDIT: Auto generated" -o plugin_service_interface.go
+ 
 import (
 	"context"
 	"encoding/json"

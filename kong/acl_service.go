@@ -1,5 +1,7 @@
 package kong
 
+//go:generate ifacemaker -f acl_service.go -s ACLService -i ACLServiceInterface -p kong -c "DO NOT EDIT: Auto generated" -o acl_service_interface.go
+ 
 import (
 	"context"
 	"encoding/json"

@@ -1,5 +1,7 @@
 package kong
 
+//go:generate ifacemaker -f certificate_service.go -s CertificateService -i CertificateServiceInterface -p kong -c "DO NOT EDIT: Auto generated" -o certificate_service_interface.go
+ 
 import (
 	"context"
 	"encoding/json"

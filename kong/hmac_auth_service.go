@@ -1,5 +1,7 @@
 package kong
 
+//go:generate ifacemaker -f hmac_auth_service.go -s HMACAuthService -i HMACAuthServiceInterface -p kong -c "DO NOT EDIT: Auto generated" -o hmac_auth_service_interface.go
+ 
 import (
 	"context"
 	"encoding/json"

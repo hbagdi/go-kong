@@ -1,5 +1,7 @@
 package kong
 
+//go:generate ifacemaker -f basic_auth_service.go -s BasicAuthService -i BasicAuthServiceInterface -p kong -c "DO NOT EDIT: Auto generated" -o basic_auth_service_interface.go
+ 
 import (
 	"context"
 	"encoding/json"
