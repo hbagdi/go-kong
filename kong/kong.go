@@ -32,22 +32,22 @@ type Client struct {
 	client         *http.Client
 	baseURL        string
 	common         service
-	Consumers      *ConsumerService
-	Services       *Svcservice
-	Routes         *RouteService
-	CACertificates *CACertificateService
-	Certificates   *CertificateService
-	Plugins        *PluginService
-	SNIs           *SNIService
-	Upstreams      *UpstreamService
-	Targets        *TargetService
+	Consumers      ConsumerServiceInterface
+	Services       SvcserviceInterface
+	Routes         RouteServiceInterface
+	CACertificates CACertificateServiceInterface
+	Certificates   CertificateServiceInterface
+	Plugins        PluginServiceInterface
+	SNIs           SNIServiceInterface
+	Upstreams      UpstreamServiceInterface
+	Targets        TargetServiceInterface
 
-	credentials *credentialService
-	KeyAuths    *KeyAuthService
-	BasicAuths  *BasicAuthService
-	HMACAuths   *HMACAuthService
-	JWTAuths    *JWTAuthService
-	ACLs        *ACLService
+	credentials credentialServiceInterface
+	KeyAuths    KeyAuthServiceInterface
+	BasicAuths  BasicAuthServiceInterface
+	HMACAuths   HMACAuthServiceInterface
+	JWTAuths    JWTAuthServiceInterface
+	ACLs        ACLServiceInterface
 
 	Oauth2Credentials *Oauth2Service
 
