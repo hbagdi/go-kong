@@ -124,3 +124,22 @@ func runWhenKong(t *testing.T, semverRange string) {
 	}
 
 }
+
+// runWhenEnterprise skips a test if the version
+// of Kong running is not enterprise edition.
+func runWhenEnterprise(t *testing.T) {
+	client, err := NewClient(nil, nil)
+	if err != nil {
+		t.Error(err)
+	}
+	res, err := client.Root(defaultCtx)
+	if err != nil {
+		t.Error(err)
+	}
+	v := res["version"].(string)
+
+	if !strings.Contains(v, "enterprise-edition") {
+		t.Skip()
+	}
+
+}
