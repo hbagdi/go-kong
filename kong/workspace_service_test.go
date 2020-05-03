@@ -35,6 +35,7 @@ func TestWorkspaceService(T *testing.T) {
 	workspace, err = client.Workspaces.Update(defaultCtx, workspace)
 	assert.Nil(err)
 	assert.NotNil(workspace)
+	assert.NotNil(workspace.Config)
 	assert.Equal("teamA", *workspace.Name)
 	assert.Equal("new comment", *workspace.Comment)
 	assert.Equal("#814CA6", workspace.Meta["color"])
