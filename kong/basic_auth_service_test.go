@@ -301,7 +301,7 @@ func TestBasicAuthListMethods(T *testing.T) {
 
 	// last page
 	// XXX: This feels like a hack. I had to change the page size here
-	// to accomodate for the super admin created during database boostrapping for Kong EE
+	// to accommodate for the super admin created during database bootstrapping for Kong EE
 	// this super admin does not appear to effect basic-auth entities returned by a call
 	// to /basic-auths but does appear to effect paging behavior.
 	next.Size = 4
