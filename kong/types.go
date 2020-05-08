@@ -220,3 +220,26 @@ type Workspace struct {
 	Config    map[string]interface{} `json:"config,omitempty" yaml:"config,omitempty"`
 	Meta      map[string]interface{} `json:"meta,omitempty" yaml:"meta,omitempty"`
 }
+
+// Workspace Entity represents a WorkspaceEntity in Kong
+type WorkspaceEntity struct {
+	EntityID         *string `json:"entity_id,omitempty" yaml:"entity_id,omitempty"`
+	EntityType       *string `json:"entity_type,omitempty" yaml:"entity_type,omitempty"`
+	UniqueFieldName  *string `json:"unique_field_name,omitempty" yaml:"unique_field_name,omitempty"`
+	UniqueFieldValue *string `json:"unique_field_value,omitempty" yaml:"unique_field_value,omitempty"`
+	WorkspaceID      *string `json:"workspace_id,omitempty" yaml:"workspace_id,omitempty"`
+	WorkspaceName    *string `json:"workspace_name,omitempty" yaml:"workspace_name,omitempty"`
+}
+
+// Admin represents an Admin in Kong.
+type Admin struct {
+	CreatedAt        *int    `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID               *string `json:"id,omitempty" yaml:"id,omitempty"`
+	Email            *string `json:"email,omitempty" yaml:"email,omitempty"`
+	Password         *string `json:"password,omitempty" yaml:"password,omitempty"`
+	Username         *string `json:"username,omitempty" yaml:"username,omitempty"`
+	CustomID         *string `json:"custom_id,omitempty" yaml:"custom_id,omitempty"`
+	RBACTokenEnabled *bool   `json:"rbac_token_enabled,omitempty" yaml:"rbac_token_enabled,omitempty"`
+	Status           *int    `json:"status,omitempty" yaml:"status,omitempty"`
+	Token            *string `json:"token,omitempty" yaml:"token,omitempty"`
+}

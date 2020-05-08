@@ -2,7 +2,9 @@ package kong
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"regexp"
 	"strings"
@@ -12,10 +14,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewClient(t *testing.T) {
+func TestNewTestClient(t *testing.T) {
 	assert := assert.New(t)
 
-	client, err := NewClient(String("foo/bar"), nil)
+	client, err := NewTestClient(String("foo/bar"), nil)
 	assert.Nil(client)
 	assert.NotNil(err)
 }
@@ -23,7 +25,7 @@ func TestNewClient(t *testing.T) {
 func TestKongStatus(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -35,7 +37,7 @@ func TestKongStatus(T *testing.T) {
 func TestRoot(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -48,7 +50,7 @@ func TestRoot(T *testing.T) {
 func TestDo(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -99,7 +101,7 @@ func cleanVersionString(version string) string {
 // tests for Kong.
 func runWhenKong(t *testing.T, semverRange string) {
 	if currentVersion.Major == 0 {
-		client, err := NewClient(nil, nil)
+		client, err := NewTestClient(nil, nil)
 		if err != nil {
 			t.Error(err)
 		}
@@ -161,4 +163,41 @@ func TestRunWhenEnterprise(T *testing.T) {
 	assert.NotNil(root)
 	v := root["version"].(string)
 	assert.Contains(v, "enterprise")
+}
+
+type HeaderRoundTripper struct {
+	headers []string
+	rt      http.RoundTripper
+}
+
+func NewTestClient(baseURL *string, client *http.Client) (*Client, error) {
+	if value, exists := os.LookupEnv("KONG_ADMIN_TOKEN"); exists {
+		c := &http.Client{}
+		defaultTransport := http.DefaultTransport.(*http.Transport)
+		c.Transport = defaultTransport
+		c.Transport = &HeaderRoundTripper{
+			headers: []string{fmt.Sprintf("kong-admin-token:%v", value)},
+			rt:      defaultTransport,
+		}
+		return NewClient(baseURL, c)
+	}
+	return NewClient(baseURL, client)
+}
+
+// RoundTrip satisfies the RoundTripper interface.
+func (t *HeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response,
+	error) {
+	newRequest := new(http.Request)
+	*newRequest = *req
+	newRequest.Header = make(http.Header, len(req.Header))
+	for k, s := range req.Header {
+		newRequest.Header[k] = append([]string(nil), s...)
+	}
+	for _, s := range t.headers {
+		split := strings.SplitN(s, ":", 2)
+		if len(split) >= 2 {
+			newRequest.Header[split[0]] = append([]string(nil), split[1])
+		}
+	}
+	return t.rt.RoundTrip(newRequest)
 }
