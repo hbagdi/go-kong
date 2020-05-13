@@ -98,7 +98,20 @@ func runWhenKong(t *testing.T, semverRange string) {
 		if rcIndex != -1 {
 			v = v[:rcIndex]
 		}
-		currentVersion, err = semver.Parse(v)
+		var shortVersion string
+		if strings.Count(v, ".") > 2 {
+			// Enterprise packages use not-semver: they take the core semver
+			// and tack their own patch version onto the end, which makes the
+			// parser sad. This strips out the patch version, so "2.0.4.1-dev-enterprise-k8s"
+			// becomes "2.0.4-dev-enterprise-k8s"
+			suffix := strings.Join(strings.Split(v, "-")[1:], "-")
+			exploded := strings.Split(v, ".")
+			sem := strings.Join(exploded[0:3], ".")
+			shortVersion = sem + "-" + suffix
+		} else {
+			shortVersion = v
+		}
+		currentVersion, err = semver.Parse(shortVersion)
 		if err != nil {
 			t.Error(err)
 		}
