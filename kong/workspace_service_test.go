@@ -58,7 +58,47 @@ func TestWorkspaceService(T *testing.T) {
 	err = client.Workspaces.Delete(defaultCtx, createdWorkspace.ID)
 	assert.Nil(err)
 }
+
 func TestWorkspaceServiceList(T *testing.T) {
+	runWhenEnterprise(T)
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	workspaceA := &Workspace{
+		Name: String("teamA"),
+	}
+	workspaceB := &Workspace{
+		Name: String("teamB"),
+	}
+
+	createdWorkspaceA, err := client.Workspaces.Create(defaultCtx, workspaceA)
+	assert.Nil(err)
+	createdWorkspaceB, err := client.Workspaces.Create(defaultCtx, workspaceB)
+	assert.Nil(err)
+	// paged List
+	page1, next, err := client.Workspaces.List(defaultCtx, &ListOpt{Size: 1})
+	assert.Nil(err)
+	assert.NotNil(next)
+	assert.NotNil(page1)
+	assert.Equal(1, len(page1))
+	// nil ListOpt List
+	workspaces, next, err := client.Workspaces.List(defaultCtx, nil)
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.NotNil(workspaces)
+	// Counts default workspace
+	assert.Equal(3, len(workspaces))
+
+	err = client.Workspaces.Delete(defaultCtx, createdWorkspaceA.ID)
+	assert.Nil(err)
+	err = client.Workspaces.Delete(defaultCtx, createdWorkspaceB.ID)
+	assert.Nil(err)
+}
+
+func TestWorkspaceServiceListAll(T *testing.T) {
 	runWhenEnterprise(T)
 	assert := assert.New(T)
 
