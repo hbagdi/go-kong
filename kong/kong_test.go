@@ -108,19 +108,9 @@ func runWhenKong(t *testing.T, semverRange string) {
 			t.Error(err)
 		}
 		v := res["version"].(string)
-		rcIndex := strings.Index(v, "rc")
-		if rcIndex != -1 {
-			v = v[:rcIndex]
-		}
-		eeIndex := strings.Index(v, "-enterprise-edition")
-		if eeIndex != -1 {
-			v = v[:eeIndex]
-		}
-		// A bit of a hack. Kong sometimes reports a version that
-		// does not match semver conventions. i.e. "1.5.0.1" will
-		// not parse properly.
-		v = strings.Join(strings.Split(v, ".")[:3], ".")
-		currentVersion, err = semver.Parse(v)
+
+		currentVersion, err = semver.Parse(cleanVersionString(v))
+
 		if err != nil {
 			t.Error(err)
 		}
