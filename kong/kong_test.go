@@ -4,6 +4,7 @@ import (
 	"context"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -78,6 +79,19 @@ func TestMain(m *testing.M) {
 }
 
 var currentVersion semver.Version
+var r = regexp.MustCompile(`^[0-9]+\.[0-9]+`)
+
+func cleanVersionString(version string) string {
+	res := r.FindString(version)
+	if res == "" {
+		panic("unexpected version of kong")
+	}
+	res += ".0"
+	if strings.Contains(version, "enterprise") {
+		res += "-enterprise"
+	}
+	return res
+}
 
 // runWhenKong skips the current test if the version of Kong doesn't
 // fall in the semverRange.
@@ -94,24 +108,9 @@ func runWhenKong(t *testing.T, semverRange string) {
 			t.Error(err)
 		}
 		v := res["version"].(string)
-		rcIndex := strings.Index(v, "rc")
-		if rcIndex != -1 {
-			v = v[:rcIndex]
-		}
-		var shortVersion string
-		if strings.Count(v, ".") > 2 {
-			// Enterprise packages use not-semver: they take the core semver
-			// and tack their own patch version onto the end, which makes the
-			// parser sad. This strips out the patch version, so "2.0.4.1-dev-enterprise-k8s"
-			// becomes "2.0.4-dev-enterprise-k8s"
-			suffix := strings.Join(strings.Split(v, "-")[1:], "-")
-			exploded := strings.Split(v, ".")
-			sem := strings.Join(exploded[0:3], ".")
-			shortVersion = sem + "-" + suffix
-		} else {
-			shortVersion = v
-		}
-		currentVersion, err = semver.Parse(shortVersion)
+
+		currentVersion, err = semver.Parse(cleanVersionString(v))
+
 		if err != nil {
 			t.Error(err)
 		}
@@ -124,5 +123,27 @@ func runWhenKong(t *testing.T, semverRange string) {
 	if !r(currentVersion) {
 		t.Skip()
 	}
+
+}
+
+// runWhenEnterprise skips a test if the version
+// of Kong running is not enterprise edition. Skips
+// the current test if the version of Kong doesn't
+// fall within the semver range.
+func runWhenEnterprise(t *testing.T, semverRange string) {
+	client, err := NewClient(nil, nil)
+	if err != nil {
+		t.Error(err)
+	}
+	res, err := client.Root(defaultCtx)
+	if err != nil {
+		t.Error(err)
+	}
+	v := res["version"].(string)
+
+	if !strings.Contains(v, "enterprise-edition") {
+		t.Skip()
+	}
+	runWhenKong(t, semverRange)
 
 }
