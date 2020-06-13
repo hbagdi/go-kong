@@ -1,3 +1,5 @@
+// +build enterprise
+
 package kong
 
 import (
@@ -8,7 +10,7 @@ import (
 )
 
 func TestAdminService(T *testing.T) {
-	runWhenEnterprise(T)
+	runWhenEnterprise(T, ">=0.33.0", false)
 	assert := assert.New(T)
 
 	client, err := NewTestClient(nil, nil)
@@ -41,7 +43,7 @@ func TestAdminService(T *testing.T) {
 }
 
 func TestAdminServiceWorkspace(T *testing.T) {
-	runWhenEnterprise(T)
+	runWhenEnterprise(T, ">=0.33.0", false)
 	assert := assert.New(T)
 
 	client, err := NewTestClient(nil, nil)
@@ -91,7 +93,7 @@ func TestAdminServiceWorkspace(T *testing.T) {
 func TestAdminServiceList(T *testing.T) {
 	assert := assert.New(T)
 	client, err := NewTestClient(nil, nil)
-	runWhenEnterprise(T)
+	runWhenEnterprise(T, ">=0.33.0", false)
 
 	assert.Nil(err)
 	assert.NotNil(client)
@@ -120,7 +122,15 @@ func TestAdminServiceList(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(admins)
 
-	assert.Equal(3, len(admins))
+	// Check if RBAC is enabled
+	res, err := client.Root(defaultCtx)
+	assert.Nil(err)
+	rbac := res["configuration"].(map[string]interface{})["rbac"].(string)
+	expectedAdmins := 3
+	if rbac == "off" {
+		expectedAdmins = 2
+	}
+	assert.Equal(expectedAdmins, len(admins))
 
 	err = client.Admins.Delete(defaultCtx, createdAdmin1.ID)
 	assert.Nil(err)
@@ -132,7 +142,7 @@ func TestAdminServiceList(T *testing.T) {
 // XXX:
 // This test requires RBAC to be enabled.
 func TestAdminServiceRegisterCredentials(T *testing.T) {
-	runWhenEnterprise(T)
+	runWhenEnterprise(T, ">=0.33.0", true)
 	assert := assert.New(T)
 
 	client, err := NewTestClient(nil, nil)

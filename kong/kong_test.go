@@ -131,9 +131,11 @@ func runWhenKong(t *testing.T, semverRange string) {
 // runWhenEnterprise skips a test if the version
 // of Kong running is not enterprise edition. Skips
 // the current test if the version of Kong doesn't
-// fall within the semver range.
-func runWhenEnterprise(t *testing.T, semverRange string) {
-	client, err := NewClient(nil, nil)
+// fall within the semver range. If a test requires
+// RBAC and RBAC is not enabled on Kong the test
+// will be skipped
+func runWhenEnterprise(t *testing.T, semverRange string, rbac bool) {
+	client, err := NewTestClient(nil, nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -146,15 +148,22 @@ func runWhenEnterprise(t *testing.T, semverRange string) {
 	if !strings.Contains(v, "enterprise-edition") {
 		t.Skip()
 	}
+
+	r := res["configuration"].(map[string]interface{})["rbac"].(string)
+
+	if rbac && r != "on" {
+		t.Skip()
+	}
+
 	runWhenKong(t, semverRange)
 
 }
 
 func TestRunWhenEnterprise(T *testing.T) {
-	runWhenEnterprise(T, ">=0.33.0")
+	runWhenEnterprise(T, ">=0.33.0", false)
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
