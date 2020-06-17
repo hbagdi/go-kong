@@ -2,7 +2,6 @@ package kong
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -134,7 +133,7 @@ func runWhenKong(t *testing.T, semverRange string) {
 // fall within the semver range. If a test requires
 // RBAC and RBAC is not enabled on Kong the test
 // will be skipped
-func runWhenEnterprise(t *testing.T, semverRange string, rbac bool) {
+func runWhenEnterprise(t *testing.T, semverRange string, rbacRequired bool) {
 	client, err := NewTestClient(nil, nil)
 	if err != nil {
 		t.Error(err)
@@ -151,7 +150,7 @@ func runWhenEnterprise(t *testing.T, semverRange string, rbac bool) {
 
 	r := res["configuration"].(map[string]interface{})["rbac"].(string)
 
-	if rbac && r != "on" {
+	if rbacRequired && r != "on" {
 		t.Skip()
 	}
 
@@ -174,39 +173,18 @@ func TestRunWhenEnterprise(T *testing.T) {
 	assert.Contains(v, "enterprise")
 }
 
-type HeaderRoundTripper struct {
-	headers []string
-	rt      http.RoundTripper
-}
-
 func NewTestClient(baseURL *string, client *http.Client) (*Client, error) {
 	if value, exists := os.LookupEnv("KONG_ADMIN_TOKEN"); exists {
 		c := &http.Client{}
 		defaultTransport := http.DefaultTransport.(*http.Transport)
 		c.Transport = defaultTransport
-		c.Transport = &HeaderRoundTripper{
-			headers: []string{fmt.Sprintf("kong-admin-token:%v", value)},
-			rt:      defaultTransport,
+		c.Transport = &headerRoundTripper{
+			headers: http.Header{
+				"kong-admin-token": []string{value},
+			},
+			rt: defaultTransport,
 		}
 		return NewClient(baseURL, c)
 	}
 	return NewClient(baseURL, client)
-}
-
-// RoundTrip satisfies the RoundTripper interface.
-func (t *HeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response,
-	error) {
-	newRequest := new(http.Request)
-	*newRequest = *req
-	newRequest.Header = make(http.Header, len(req.Header))
-	for k, s := range req.Header {
-		newRequest.Header[k] = append([]string(nil), s...)
-	}
-	for _, s := range t.headers {
-		split := strings.SplitN(s, ":", 2)
-		if len(split) >= 2 {
-			newRequest.Header[split[0]] = append([]string(nil), split[1])
-		}
-	}
-	return t.rt.RoundTrip(newRequest)
 }
