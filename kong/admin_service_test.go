@@ -28,7 +28,7 @@ func TestAdminService(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(createdAdmin)
 
-	admin, err = client.Admins.Get(defaultCtx, createdAdmin.ID, false)
+	admin, err = client.Admins.Get(defaultCtx, createdAdmin.ID)
 	assert.Nil(err)
 	assert.NotNil(admin)
 
@@ -73,7 +73,7 @@ func TestAdminServiceWorkspace(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(createdAdmin)
 
-	admin, err = client.Admins.Get(defaultCtx, createdAdmin.ID, false)
+	admin, err = client.Admins.Get(defaultCtx, createdAdmin.ID)
 	assert.Nil(err)
 	assert.NotNil(admin)
 
@@ -161,7 +161,7 @@ func TestAdminServiceRegisterCredentials(T *testing.T) {
 	assert.NotNil(admin)
 
 	// Generate a new registration URL for the Admin
-	admin, err = client.Admins.Get(defaultCtx, admin.ID, true)
+	admin, err = client.Admins.GenerateRegisterURL(defaultCtx, admin.ID)
 	assert.Nil(err)
 	assert.NotNil(admin)
 
@@ -170,7 +170,7 @@ func TestAdminServiceRegisterCredentials(T *testing.T) {
 	err = client.Admins.RegisterCredentials(defaultCtx, admin)
 	assert.Nil(err)
 
-	admin, err = client.Admins.Get(defaultCtx, admin.ID, false)
+	admin, err = client.Admins.Get(defaultCtx, admin.ID)
 	assert.Nil(err)
 	assert.NotNil(admin)
 

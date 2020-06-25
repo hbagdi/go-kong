@@ -44,18 +44,38 @@ func (s *AdminService) Create(ctx context.Context,
 
 // Get fetches a Admin in Kong.
 func (s *AdminService) Get(ctx context.Context,
-	nameOrID *string, generateRegisterURL bool) (*Admin, error) {
+	nameOrID *string) (*Admin, error) {
 
 	if isEmptyString(nameOrID) {
 		return nil, errors.New("nameOrID cannot be nil for Get operation")
 	}
 
-	var endpoint string
-	if generateRegisterURL {
-		endpoint = fmt.Sprintf("/admins/%v?generate_register_url=true", *nameOrID)
-	} else {
-		endpoint = fmt.Sprintf("/admins/%v", *nameOrID)
+	endpoint := fmt.Sprintf("/admins/%v", *nameOrID)
+
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
+	if err != nil {
+		return nil, err
 	}
+
+	var Admin Admin
+	_, err = s.client.Do(ctx, req, &Admin)
+	if err != nil {
+		return nil, err
+	}
+	return &Admin, nil
+}
+
+// GenerateRegisterURL fetches an Admin in Kong
+// and returns a unique registration URL for the Admin
+func (s *AdminService) GenerateRegisterURL(ctx context.Context,
+	nameOrID *string) (*Admin, error) {
+
+	if isEmptyString(nameOrID) {
+		return nil, errors.New("nameOrID cannot be nil for Get operation")
+	}
+
+	endpoint := fmt.Sprintf("/admins/%v?generate_register_url=true", *nameOrID)
+
 	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
@@ -143,7 +163,7 @@ func (s *AdminService) RegisterCredentials(ctx context.Context,
 	admin *Admin) error {
 
 	if admin == nil {
-		return errors.New("cannot register credentials on a nil Admin")
+		return errors.New("cannot register credentials for a nil Admin")
 	}
 
 	if isEmptyString(admin.Username) {
