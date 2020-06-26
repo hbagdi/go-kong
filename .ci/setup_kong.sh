@@ -27,7 +27,8 @@ function setup_kong_enterprise(){
     -u $KONG_ENTERPRISE_REPO_USERNAME:$KONG_ENTERPRISE_REPO_PASSSWORD \
     $URL -o kong.deb)
   if [[ $RESPONSE_CODE != "200" ]]; then
-    echo "error retrieving kong enterprise package. response code ${RESPONSE_CODE}"
+    echo "error retrieving kong enterprise package from ${URL}. response code ${RESPONSE_CODE}"
+    exit 1 
   fi
 }
 
