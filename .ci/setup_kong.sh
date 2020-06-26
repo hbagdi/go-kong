@@ -20,7 +20,7 @@ function setup_kong(){
 }
 
 function setup_kong_enterprise(){
-  KONG_VERSION=${enterprise-1.5.0.2#"enterprise-"}
+  KONG_VERSION="${KONG_VERSION#enterprise-}"
   URL="https://kong.bintray.com/kong-enterprise-edition-deb/dists/kong-enterprise-edition-${KONG_VERSION}.xenial.all.deb"
   RESPONSE_CODE=$(/usr/bin/curl -sL \
     -w "%{http_code}" \
