@@ -20,11 +20,15 @@ function setup_kong(){
 }
 
 function setup_kong_enterprise(){
-  KONG_VERSION=${KONG_VERSION#"enterprise-"}
+  KONG_VERSION=${enterprise-1.5.0.2#"enterprise-"}
   URL="https://kong.bintray.com/kong-enterprise-edition-deb/dists/kong-enterprise-edition-${KONG_VERSION}.xenial.all.deb"
-  /usr/bin/curl -sL \
+  RESPONSE_CODE=$(/usr/bin/curl -sL \
+    -w "%{http_code}" \
     -u $KONG_ENTERPRISE_REPO_USERNAME:$KONG_ENTERPRISE_REPO_PASSSWORD \
-    $URL -o kong.deb
+    $URL -o kong.deb)
+  if [[ $RESPONSE_CODE != "200" ]]; then
+    echo "error retrieving kong enterprise package. response code ${RESPONSE_CODE}"
+  fi
 }
 
 if [[ $KONG_VERSION == *"enterprise"* ]]; then
