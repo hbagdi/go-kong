@@ -227,6 +227,7 @@ type Admin struct {
 	ID               *string `json:"id,omitempty" yaml:"id,omitempty"`
 	Email            *string `json:"email,omitempty" yaml:"email,omitempty"`
 	Username         *string `json:"username,omitempty" yaml:"username,omitempty"`
+	Password         *string `json:"password,omitempty" yaml:"password,omitempty"`
 	CustomID         *string `json:"custom_id,omitempty" yaml:"custom_id,omitempty"`
 	RBACTokenEnabled *bool   `json:"rbac_token_enabled,omitempty" yaml:"rbac_token_enabled,omitempty"`
 	Status           *int    `json:"status,omitempty" yaml:"status,omitempty"`
