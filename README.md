@@ -1,3 +1,9 @@
+# DEPRECATED
+
+This repository has moved to https://github.com/kong/go-kong.
+Please update your import paths to use the new path.
+This repository exists only for backwards compatibility purpose.
+
 # go-kong
 
 Go bindings for Kong's Admin API
